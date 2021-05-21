@@ -1,0 +1,46 @@
+type Query {
+  query_range(query: String): [SampleStream]!
+  query(query: String): [Sample]!
+  label_values(label: String!): [String]!
+  name_values: [String]!
+  labels: [String]!
+  series(match: [String]!): [Map]!
+  targets: TargetsResult
+}
+
+type SampleStream {
+  metric: Map
+  values: [SamplePair]
+}
+
+type SamplePair {
+  timestamp: Int
+  value: Float
+}
+
+type Sample {
+  timestamp: Int
+  value: Float
+  metric: Map
+}
+
+type TargetsResult {
+ active:  [ActiveTarget]
+	dropped: [DroppedTarget]
+}
+
+type ActiveTarget {
+	discoveredLabels: Map
+	#labels:          model.LabelSet    `json:"labels"`
+	scrapeURL:        String
+	lastError:        String
+	#lastScrape       time.Time
+	#health:           HealthStatus      `json:"health"`
+}
+
+type DroppedTarget {
+	discoveredLabels: Map
+}
+
+scalar Map
+
