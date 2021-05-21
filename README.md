@@ -2,6 +2,8 @@
 
 Simple GraphQL generator which generates GraphQL endpoint from Prometheus server.
 
+<img src="./prometheus-graphql.png" width=400px>
+
 ## TL;DR
 
 Start GraphQL server.
