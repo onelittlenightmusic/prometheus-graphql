@@ -1,5 +1,5 @@
 type Query {
-  query_range(query: String): [SampleStream]!
+  query_range(query: String, stepInMin: Int = 3, start: String = "2021-06-22T15:04:05-0700", end: String = "2021-06-24T15:04:05-0700"): [SampleStream]!
   query(query: String): [Sample]!
   label_values(label: String!): [String]!
   name_values: [String]!

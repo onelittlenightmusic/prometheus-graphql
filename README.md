@@ -9,7 +9,13 @@ Simple GraphQL generator which generates GraphQL endpoint from Prometheus server
 Start GraphQL server.
 
 ```sh
-go run server.go
+go run app/server.go
+```
+
+Build GraphQL server.
+
+```sh
+go build -o bin/server app/server.go
 ```
 
 Access GraphQL Playground interface.
@@ -118,3 +124,44 @@ This query can be replaced with just ` { name_values }`.
 ```
 
 This metrics can be fetched if you installed `kube-state-metrics` on your Kubernetes cluster.
+
+# Configure
+
+Create a `config/config.yaml` depending on your usage.
+
+```config.yaml
+spec:
+  prometheusAddress: http://192.168.0.71:9090/
+```
+
+Mount this file on `./config/` directory or `/config/` directory in container.
+
+# Another run type
+
+## Docker
+
+```sh
+docker run -d --name graphql -p 8080:8080 --volume $(PWD)/config:/config hiroyukiosaki/prometheus-graphql:latest 
+```
+
+or configure `docker-compose.yaml` and run this command.
+
+```sh
+docker-compose up -d
+```
+
+And access `http://localhost:8080`.
+
+## Kubernetes
+
+Just run 
+
+```sh
+kubectl apply -f k8s
+```
+
+```sh
+kubectl port-forward svc/prom-graphql-svc 8080:8080
+```
+
+And access `http://localhost:8080`.

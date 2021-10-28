@@ -63,7 +63,7 @@ type ComplexityRoot struct {
 		Labels      func(childComplexity int) int
 		NameValues  func(childComplexity int) int
 		Query       func(childComplexity int, query *string) int
-		QueryRange  func(childComplexity int, query *string) int
+		QueryRange  func(childComplexity int, query *string, stepInMin *int, start *string, end *string) int
 		Series      func(childComplexity int, match []*string) int
 		Targets     func(childComplexity int) int
 	}
@@ -97,7 +97,7 @@ type DroppedTargetResolver interface {
 	DiscoveredLabels(ctx context.Context, obj *v1.DroppedTarget) (map[string]interface{}, error)
 }
 type QueryResolver interface {
-	QueryRange(ctx context.Context, query *string) ([]*model.SampleStream, error)
+	QueryRange(ctx context.Context, query *string, stepInMin *int, start *string, end *string) ([]*model.SampleStream, error)
 	Query(ctx context.Context, query *string) ([]*model.Sample, error)
 	LabelValues(ctx context.Context, label string) ([]*string, error)
 	NameValues(ctx context.Context) ([]*string, error)
@@ -209,7 +209,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			return 0, false
 		}
 
-		return e.complexity.Query.QueryRange(childComplexity, args["query"].(*string)), true
+		return e.complexity.Query.QueryRange(childComplexity, args["query"].(*string), args["stepInMin"].(*int), args["start"].(*string), args["end"].(*string)), true
 
 	case "Query.series":
 		if e.complexity.Query.Series == nil {
@@ -344,7 +344,7 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 
 var sources = []*ast.Source{
 	{Name: "graph/schema.graphqls", Input: `type Query {
-  query_range(query: String): [SampleStream]!
+  query_range(query: String, stepInMin: Int = 3, start: String = "2021-06-22T15:04:05-0700", end: String = "2021-06-24T15:04:05-0700"): [SampleStream]!
   query(query: String): [Sample]!
   label_values(label: String!): [String]!
   name_values: [String]!
@@ -454,6 +454,33 @@ func (ec *executionContext) field_Query_query_range_args(ctx context.Context, ra
 		}
 	}
 	args["query"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["stepInMin"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("stepInMin"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["stepInMin"] = arg1
+	var arg2 *string
+	if tmp, ok := rawArgs["start"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("start"))
+		arg2, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["start"] = arg2
+	var arg3 *string
+	if tmp, ok := rawArgs["end"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("end"))
+		arg3, err = ec.unmarshalOString2ᚖstring(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["end"] = arg3
 	return args, nil
 }
 
@@ -663,7 +690,7 @@ func (ec *executionContext) _Query_query_range(ctx context.Context, field graphq
 	fc.Args = args
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().QueryRange(rctx, args["query"].(*string))
+		return ec.resolvers.Query().QueryRange(rctx, args["query"].(*string), args["stepInMin"].(*int), args["start"].(*string), args["end"].(*string))
 	})
 	if err != nil {
 		ec.Error(ctx, err)

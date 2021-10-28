@@ -7,7 +7,7 @@ import (
 	"context"
 
 	"github.com/hiroyukiosaki/graphql-prometheus/graph/generated"
-	v1 "github.com/prometheus/client_golang/api/prometheus/v1"
+	"github.com/prometheus/client_golang/api/prometheus/v1"
 	model1 "github.com/prometheus/common/model"
 )
 
@@ -27,8 +27,8 @@ func (r *droppedTargetResolver) DiscoveredLabels(ctx context.Context, obj *v1.Dr
 	return rtn, nil
 }
 
-func (r *queryResolver) QueryRange(ctx context.Context, query *string) ([]*model1.SampleStream, error) {
-	result := queryRange(ctx, *query, 2, 30)
+func (r *queryResolver) QueryRange(ctx context.Context, query *string, stepInMin *int, start *string, end *string) ([]*model1.SampleStream, error) {
+	result := queryRange(ctx, *query, *stepInMin, *start, *end)
 
 	return result, nil
 }

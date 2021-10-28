@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: prom-graphql
+  name: prom-graphql
+spec:
+  containers:
+  - image: hiroyukiosaki/prometheus-graphql:latest
+    name: prom-graphql
+    resources: {}
+    volumeMounts:
+    - name: config-volume
+      mountPath: /config
+  dnsPolicy: ClusterFirst
+  restartPolicy: Always
+  volumes:
+  - name: config-volume
+    configMap:
+      name: prom-graphql-config
+status: {}

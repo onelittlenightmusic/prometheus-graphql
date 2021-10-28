@@ -30,7 +30,7 @@ type Config struct {
 
 func loadConfig() {
 	c := Config{}
-	data, err := ioutil.ReadFile("./config.yaml")
+	data, err := ioutil.ReadFile("./config/config.yaml")
 	if err != nil {
 		log.Fatalf("error: %v", err)
 	}
@@ -64,13 +64,16 @@ func Init(ctx context.Context) (context.Context, context.CancelFunc, v1.API) {
 	return ctx0, cancel, v1api
 }
 
-func queryRange(ctx context.Context, query string, stepInMin int, historyInMin int) model.Matrix {
+func queryRange(ctx context.Context, query string, stepInMin int, start string, end string) model.Matrix {
 	ctx0, cancel, v1api := Init(ctx)
 	defer cancel()
 
+	startTime, _ := time.Parse("2006-01-02T15:04:05-0700", start)
+	endTime, _ := time.Parse("2006-01-02T15:04:05-0700", end)
+
 	r := v1.Range{
-		Start: time.Now().Add(-time.Minute * time.Duration(historyInMin)),
-		End:   time.Now(),
+		Start: startTime,
+		End:   endTime,
 		Step:  time.Minute * time.Duration(stepInMin),
 	}
 
